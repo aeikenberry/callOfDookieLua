@@ -3,6 +3,7 @@ require('state')
 
 Patron = {}
 Patron.__index = Patron
+
 local patrons = {
     "patron1",
     "patron2"
@@ -28,20 +29,19 @@ for i, v in ipairs(patrons) do
 end
 
 function Patron.create()
-    local var = math.random(self.VARIANT_COUNT)
-    local p = {}
-    setmetatable(p, Patron)
-    s.currentPosition = positions[6]
+    local var = math.random(Patron.VARIANT_COUNT)
+    local s = {}
+    setmetatable(s, Patron)
+    s.position = tonumber(string.sub(tostring(positions[math.random(#positions)]), 1, 11))
     s.x = s.currentPosition
     s.y = 300
     s.walkingSpeed = .5
     s.irritibility = math.random(30)
     s.imgSet = patronsImg[var]
     s.state = State.create('normal')
-    s.anim = newAnimation(s.imgSet[s.state], 100, 300, 0.1, 0)
+    s.anim = newAnimation(s.imgSet.normal, 125, 300, 0.1, 0)
     s.anim:setMode('loop')
-
-    return p
+    return s
 end
 
 function Patron:update(dt)
@@ -52,7 +52,7 @@ function Patron:draw()
     if self.finished then
         return
     end
-    self.anim:draw(self.currentPosition, 300)
+    self.anim:draw(self.position, 300)
 end
 
 function Patron:getPosition()
@@ -65,4 +65,20 @@ end
 
 function Patron:walk(from, to)
     self.state = State.create('walking')
-    self.anim
+end
+
+function Patron:getState()
+    return self.state.name
+end
+
+---  Param Choices Are:
+--'normal'
+--'danger'
+--'gross'
+--'walking'
+--'finish'
+function Patron:changeAnim(state)
+    self.anim = nil
+    self.anim = newAnimation(self.imgSet[state], 125, 300, 0.1, 0)
+    self.state:setState(state)
+end

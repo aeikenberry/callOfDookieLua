@@ -1,5 +1,5 @@
 require('AnAL')
-
+require('patron')
 
 
 function love.load()
@@ -12,9 +12,12 @@ function love.load()
     -- Selection Hand
     hand = {}
     hand['img'] = love.graphics.newImage('img/PointerHand.png')
-    hand['x'] = 300 -- Initial values
-    hand['y'] = 400 -- Initial values
-    hand['position'] = 3 -- Initial position
+    hand['y'] = 610 -- Initial values
+    hand['position'] = 300 -- Initial position
+
+    patrons = {}
+    patrons[1] = Patron.create()
+    patrons[2] = Patron.create()
 end
 
 function love.update(dt)
@@ -30,13 +33,16 @@ function love.update(dt)
 
     -- Bouncer will always be on the screen
     point:update(dt)
+    for i,v in ipairs(patrons) do patrons[i]:update(dt) end
+
 
 end
 
 --- What's going to get drawn?
 function love.draw()
-    point:draw(100, 100)
-    love.graphics.draw(hand['img'], hand['x'], hand['y'])
+    point:draw(100, 400)
+    for i,v in ipairs(patrons) do patrons[i]:draw(100, 300) end
+    love.graphics.draw(hand['img'], hand['position'], hand['y'])
 end
 
 function love.mousepressed(x, y, button)
@@ -58,25 +64,29 @@ function love.keypressed(key, unicode)
 
     --- Hand Movement
     -- left
-    if key == 'left' and hand['x'] ~= 100 then
-        hand['x'] = hand['x'] - 100
-        hand['position'] = hand['position'] - 1
+    if key == 'left' and hand['position'] ~= 300 then
+        hand['position'] = hand['position'] - 100
     end
     -- right
-    if key == 'right' and hand['x'] ~= 600 then
-        hand['x'] = hand['x'] + 100
-        hand['position'] = hand['position'] + 1
+    if key == 'right' and hand['x'] ~= 900 then
+        hand['position'] = hand['position'] + 100
     end
 
     -- Patron Selection
-    -- if key == 'return' then
-    --     -- Check to see if there is a patron at that spot
-    --     position = hand['position']
-    --     for patron=1, #patrons, 1 do
-    --         if patrons[patron]['position'] = position then
-    --             -- We selected this one.
-    --         end
-    --     end
+    if key == 'return' then
+        -- Check to see if there is a patron at that spot
+        position = hand['position']
+        for patron=1, #patrons, 1 do
+            if patrons[patron]['position'] == position then
+                -- We selected this one.
+                if patrons[patron]:getState() ~= 'danger' then
+                    patrons[patron]:change('danger')
+                else
+                    patrons[patron]:change('normal')
+                end
+            end
+        end
+    end
 
 
 end
