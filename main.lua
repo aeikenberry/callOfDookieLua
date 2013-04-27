@@ -76,13 +76,36 @@ function love.keypressed(key, unicode)
     if key == 'return' then
         -- Check to see if there is a patron at that spot
         position = hand['position']
+        selected = false
+        selectedPatron = nil
+        for patron=1, #patrons, 1 do 
+            if patrons[patron].selected == true then
+                selected = true
+                selectedPatron = patrons[patron]
+            end
+        end
+
         for patron=1, #patrons, 1 do
+            print(patrons[patron]['position'], position)
             if patrons[patron]['position'] == position then
                 -- We selected this one.
                 if patrons[patron]:getState() ~= 'danger' then
-                    patrons[patron]:change('danger')
+                    if selected == true then
+                        print(selectedPatron)
+                        patrons[patron]:switchWith(selectedPatron)
+                        patrons[patron]:change('normal')
+                        selectedPatron:change('normal')
+                        selected = false
+                        break
+                    else
+                        patrons[patron]:change('danger')
+                        patrons[patron].selected = true
+                        selected = true
+                        break
+                    end
                 else
                     patrons[patron]:change('normal')
+                    patrons[patron].selected = false
                 end
             end
         end

@@ -33,12 +33,14 @@ function Patron.create()
     local s = {}
     setmetatable(s, Patron)
     s.position = tonumber(string.sub(tostring(positions[math.random(#positions)]), 1, 11))
-    s.x = s.currentPosition
+    s.x = s.position
     s.y = 300
-    s.walkingSpeed = .5
+    s.speed = 50
+    s.xvel = 0
     s.irritibility = math.random(30)
     s.imgSet = patronsImg[var]
-    s.state = State.create('normal')
+    s.state = 'normal'
+    s.selected = false
     s.anim = newAnimation(s.imgSet.normal, 125, 300, 0.1, 0)
     s.anim:setMode('loop')
     return s
@@ -52,7 +54,7 @@ function Patron:draw()
     if self.finished then
         return
     end
-    self.anim:draw(self.position, 300)
+    self.anim:draw(self.x, 300)
 end
 
 function Patron:getPosition()
@@ -63,8 +65,24 @@ function Patron:destroy()
     self.finished = true
 end
 
-function Patron:walk(from, to)
-    self.state = State.create('walking')
+function Patron:switchWith(patron)
+    x = patron.x
+    y = patron.y
+    pos = patron.pos
+    print("switchWith: x=",x, " y=", y, self.x, patron)
+    patron.x = self.x
+    patron.y = self.y
+    patron.position = self.position1
+    self.x = x
+    self.y = y
+    self.position = pos
+end
+
+
+function Patron:walk(x, y)
+    self:change('walking')
+    self.x = x
+    self.y = y
 end
 
 function Patron:getState()
@@ -77,8 +95,8 @@ end
 --'gross'
 --'walking'
 --'finish'
-function Patron:changeAnim(state)
+function Patron:change(state)
     self.anim = nil
     self.anim = newAnimation(self.imgSet[state], 125, 300, 0.1, 0)
-    self.state:setState(state)
+    self.state = state
 end
