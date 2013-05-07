@@ -35,7 +35,6 @@ animation.__index = animation
 -- @param frames The number of frames, 0 for autodetect
 -- @return The created animation
 function newAnimation(image, fw, fh, delay, frames)
-	print("newAnimation: ", image, fw, fh, delay, frames)
 	local a = {}
 	a.img = image
 	a.frames = {}

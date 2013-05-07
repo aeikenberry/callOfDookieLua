@@ -10,12 +10,12 @@ local patrons = {
 }
 Patron.VARIANT_COUNT = table.getn(patrons)
 local positions = {
-    200,
-    300,
     400,
     500,
     600,
-    700
+    700,
+    800,
+    900
 }
 local patronsImg = {}
 for i, v in ipairs(patrons) do
@@ -28,12 +28,11 @@ for i, v in ipairs(patrons) do
     patronsImg[i] = patron
 end
 
-function Patron.create()
+function Patron.create(pos)
     local var = math.random(Patron.VARIANT_COUNT)
     local s = {}
     setmetatable(s, Patron)
-    s.position = tonumber(string.sub(tostring(positions[math.random(#positions)]), 1, 11))
-    s.x = s.position
+    s.position = pos or positions[math.random(#positions)]
     s.y = 300
     s.speed = 50
     s.xvel = 0
@@ -54,39 +53,43 @@ function Patron:draw()
     if self.finished then
         return
     end
-    self.anim:draw(self.x, 300)
-end
-
-function Patron:getPosition()
-    return self.currentPosition
+    self.anim:draw(self.position, 300)
 end
 
 function Patron:destroy()
     self.finished = true
+    self.selected = false
+    self.position = -100
 end
+
+function Patron:shiftLeft()
+    self.position = self.position - 100
+end
+
 
 function Patron:switchWith(patron)
-    x = patron.x
     y = patron.y
-    pos = patron.pos
-    print("switchWith: x=",x, " y=", y, self.x, patron)
-    patron.x = self.x
+    pos = patron.position
+
     patron.y = self.y
-    patron.position = self.position1
-    self.x = x
+    patron.position = self.position
+    
     self.y = y
     self.position = pos
+
+    self:change('normal')
+    patron:change('normal')
 end
 
 
-function Patron:walk(x, y)
+function Patron:walk(pos, y)
     self:change('walking')
-    self.x = x
+    self.position = x
     self.y = y
 end
 
 function Patron:getState()
-    return self.state.name
+    return self.state
 end
 
 ---  Param Choices Are:
